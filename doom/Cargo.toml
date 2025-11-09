@@ -1,0 +1,13 @@
+[package]
+name = "doom-2038"
+version = "1.0.1"
+edition = "2024"
+authors = ["Edward <edwardstrowaway@gmail.com>"]
+description = "doom is impending, be happy while you still can. 03:14:07 UTC 19 January 2038"
+license = "Unlicense"
+repository = "https://github.com/SDEdward/2038-doom"
+readme = "../README.md"
+keywords = ["2038", "countdown", "unix", "cli", "fun"]
+categories = ["command-line-utilities", "date-and-time"]
+
+[dependencies]
