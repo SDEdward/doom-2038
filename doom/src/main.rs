@@ -1,10 +1,9 @@
-use doom_2038::doom;
 use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let countdown = match args.get(1).map(String::as_str) {
+    let _countdown = match args.get(1).map(String::as_str) {
         None => false,
         Some("c") | Some("count") | Some("countdown") => true,
         Some(arg) => {
@@ -14,5 +13,5 @@ fn main() {
         }
     };
 
-    doom(countdown);
+    doom_2038::doom(false);
 }

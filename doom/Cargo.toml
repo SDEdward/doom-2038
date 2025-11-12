@@ -1,13 +1,14 @@
 [package]
 name = "doom-2038"
-version = "1.0.1"
+version = "1.1.2"
 edition = "2024"
 authors = ["Edward <edwardstrowaway@gmail.com>"]
-description = "doom is impending, be happy while you still can. 03:14:07 UTC 19 January 2038"
+description = "Doom is impending; be happy while you still can. 03:14:07 UTC 19 January 2038."
 license = "Unlicense"
-repository = "https://github.com/SDEdward/2038-doom"
+repository = "https://github.com/SDEdward/doom-2038"
+homepage = "https://sdeward.github.io/doom-2038"  # Optional: Update with your actual homepage if available
 readme = "../README.md"
-keywords = ["2038", "countdown", "unix", "cli", "fun"]
+keywords = ["2038", "countdown", "cli", "fun", "year-2038-problem"]
 categories = ["command-line-utilities", "date-and-time"]
 
 [dependencies]
