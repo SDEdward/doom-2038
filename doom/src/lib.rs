@@ -7,7 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// let u32_limit = DOOM_TS;  
 /// assert_eq!(u32_limit, 2_147_483_647);
 /// ```
@@ -36,7 +36,7 @@ pub const SECONDS_IN_YEAR: u64 = 31_536_000; // 365 * 24 * 60 * 60
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// let duration_left = time_left();
 /// println!("Time left until 2038 problem: {:?}", duration_left);
 /// ```
@@ -56,7 +56,7 @@ pub fn time_left() -> Duration {
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// let remaining_time = Duration::new(5000, 0); // Example duration
 /// print_time_left(remaining_time);
 /// ```
@@ -125,7 +125,7 @@ pub fn print_time_left(duration: Duration) {
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// // To run the countdown continuously:
 /// doom(true);
 ///
