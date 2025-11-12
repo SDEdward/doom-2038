@@ -21,10 +21,11 @@ jobs:
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
-
         with:
-          rust-version: ${{ matrix.toolchain }}
+          toolchain: ${{ matrix.toolchain }}
+          profile: minimal
           components: clippy,rustfmt
+          override: true
 
       - name: Cache cargo registry and build
         uses: actions/cache@v4
