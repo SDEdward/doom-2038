@@ -1,0 +1,91 @@
+name: Build and publish release binaries
+
+on:
+  release:
+    types: [created]
+
+env:
+  # name of the binary produced by cargo (adjust if different)
+  BINARY_NAME: doom
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            archive: doom-linux.tar.gz
+            runs-on: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            archive: doom-windows.zip
+            runs-on: windows-latest
+
+    name: Build for ${{ matrix.target }}
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Add target
+        if: matrix.target != 'x86_64-unknown-linux-gnu'
+        run: rustup target add ${{ matrix.target }}
+        shell: bash
+
+      - name: Install build dependencies (Windows toolchain on ubuntu if needed)
+        if: matrix.target == 'x86_64-pc-windows-msvc' && runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64
+        shell: bash
+
+      - name: Build (release)
+        run: |
+          # On Windows runner build normally; on Linux target build native or with cross if desired.
+          if [[ "${{ matrix.runs-on }}" == "windows-latest" ]]; then
+            cargo build --release
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+        shell: bash
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p out
+          if [[ "${{ matrix.runs-on }}" == "windows-latest" ]]; then
+            BIN_PATH="target\\release\\${BINARY_NAME}.exe"
+            powershell -Command "Compress-Archive -Path $BIN_PATH -DestinationPath out\\${{ matrix.archive }}" 
+          else
+            BIN_PATH="target/${{ matrix.target }}/release/${BINARY_NAME}"
+            tar -C "$(dirname "$BIN_PATH")" -czf out/${{ matrix.archive }} "$(basename "$BIN_PATH")"
+          fi
+        shell: bash
+
+      - name: Create GitHub release (ensure exists)
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: out/${{ matrix.archive }}
+          asset_name: ${{ matrix.archive }}
+          asset_content_type: application/octet-stream
