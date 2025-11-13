@@ -15,8 +15,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         toolchain: [stable, nightly]
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Rust toolchain
@@ -27,7 +28,7 @@ jobs:
           components: clippy,rustfmt
           override: true
 
-      - name: Cache cargo registry and build
+      - name: Cache cargo registry and build artifacts
         uses: actions/cache@v4
         with:
           path: |
@@ -38,28 +39,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.toolchain }}-
 
-      - name: Show rustc & cargo versions
+      - name: Show Rust versions
         run: |
           rustc --version
           cargo --version
 
-      - name: Auto-format code
-        run: cargo fmt --all
+      - name: Format code
+        run: cargo fmt --all -- --check
         working-directory: doom
 
       - name: Check library builds
         run: cargo check --all --all-targets
         working-directory: doom
 
-      - name: Run tests
+      - name: Run doc tests
+        run: cargo test --doc
+        working-directory: doom
+
+      - name: Run unit and integration tests
         run: cargo test --all --verbose
         working-directory: doom
 
-      - name: Run benches (nightly only)
+      - name: Run benchmarks (nightly only)
         if: matrix.toolchain == 'nightly'
         run: cargo bench --all --verbose
         working-directory: doom
 
-      - name: Clippy (deny warnings)
+      - name: Run Clippy (deny warnings)
         run: cargo clippy --all-targets --all-features -- -D warnings
         working-directory: doom
