@@ -8,7 +8,21 @@ env:
   BINARY_NAME: doom-2038
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-and-upload:
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -63,17 +77,6 @@ jobs:
             tar -C "$(dirname "$BIN_PATH")" -czf out/${{ matrix.archive }} "$(basename "$BIN_PATH")"
           fi
         shell: bash
-
-      - name: Create GitHub release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
