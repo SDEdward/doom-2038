@@ -8,41 +8,24 @@ on:
     branches:
       - main
 
-
 env:
   BINARY_NAME: doom-2038
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-and-upload:
-    needs: create-release
+  build-and-move:
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: x86_64-unknown-linux-gnu
-            archive: doom-linux.tar.gz
             runs-on: ubuntu-latest
           - target: x86_64-pc-windows-msvc
-            archive: doom-windows.zip
             runs-on: windows-latest
 
     name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Rust
@@ -52,7 +35,7 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Add target
+      - name: Add target (if cross-compiling)
         if: matrix.target != 'x86_64-unknown-linux-gnu'
         run: rustup target add ${{ matrix.target }}
 
@@ -63,6 +46,7 @@ jobs:
           sudo apt-get install -y mingw-w64
 
       - name: Build release binary
+        working-directory: ./doom
         run: |
           if [[ "${{ matrix.runs-on }}" == "windows-latest" ]]; then
             cargo build --release
@@ -71,21 +55,12 @@ jobs:
           fi
         shell: bash
 
-      - name: Package binary
+      - name: Move binary to release folder
         run: |
-          mkdir -p out
+          mkdir -p release
           if [[ "${{ matrix.runs-on }}" == "windows-latest" ]]; then
-            BIN_PATH="target\\release\\${BINARY_NAME}.exe"
-            powershell -Command "Compress-Archive -Path $BIN_PATH -DestinationPath out\\${{ matrix.archive }}"
+            cp doom\\target\\release\\${BINARY_NAME}.exe release\\
           else
-            BIN_PATH="target/${{ matrix.target }}/release/${BINARY_NAME}"
-            tar -C "$(dirname "$BIN_PATH")" -czf out/${{ matrix.archive }} "$(basename "$BIN_PATH")"
+            cp doom/target/${{ matrix.target }}/release/${BINARY_NAME} release/
           fi
         shell: bash
-
-      - name: Upload release asset
-        uses: softprops/action-gh-release@v1
-        with:
-          files: out/${{ matrix.archive }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
