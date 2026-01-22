@@ -1,6 +1,6 @@
 [package]
 name = "doom-2038"
-version = "1.2.1"
+version = "1.2.2"
 edition = "2024"
 authors = ["Edward <edwardstrowaway@gmail.com>"]
 description = "Doom is impending; be happy while you still can. 03:14:07 UTC 19 January 2038."
