@@ -2,10 +2,10 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// The Unix timestamp for the Year 2038 problem:
-/// 2038-01-19 03:14:07 UTC. This timestamp represents
-/// the maximum value for a 32-bit signed integer.
+/// 2038-01-19 03:14:07 UTC. This is just the
+/// highest possible value of u32. Added this in cuz why not
 ///
-/// # Examples
+/// # Example
 ///
 /// ```
 /// use doom_2038::DOOM_TS;
@@ -23,7 +23,12 @@ pub const SECONDS_IN_HOUR: u64 = 3600;
 pub const SECONDS_IN_DAY: u64 = 86_400; // 24 * 60 * 60
 /// Amount of seconds in a year
 pub const SECONDS_IN_YEAR: u64 = 31_536_000; // 365 * 24 * 60 * 60
-
+/// Amount of minutes in a hour
+pub const MINUTES_IN_HOUR: u64 = 60;
+/// Amount of minutes in a day
+pub const MINUTES_IN_DAY: u64 = 1440;
+/// Amount of days in a week
+pub const DAYS_IN_WEEK: u64 = 7;
 /// Calculates the time left until the Year 2038 problem occurs,
 /// returning it as a `Duration`.
 ///
